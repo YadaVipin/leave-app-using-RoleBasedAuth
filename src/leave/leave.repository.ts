@@ -1,6 +1,6 @@
 import { InternalServerErrorException } from "@nestjs/common";
 import { User } from "../auth/user.entity";
-import { EntityRepository, Repository } from "typeorm";
+import { EntityRepository, getMongoManager, getMongoRepository, Repository } from "typeorm";
 import { CreateLeaveDto } from "./dto/create-leave.dto";
 import { GetLeavesFilterDto } from "./dto/get-leave.dto";
 import { LeaveStatus } from "./leave-status.enum";
@@ -25,34 +25,12 @@ export class LeaveRepository extends Repository <Leave> {
     async getLeaves(filterDto: GetLeavesFilterDto, ): Promise<Leave[]> {
         const { status, search, sort, page, perPage } = filterDto;
 
+        const leaveRepository = getMongoRepository(Leave);
 
         const query = this.createQueryBuilder('leave');
-
-        if (status) {
-            query.andWhere('leave.status = :status', { status })
-        }
-
-        if (search) {
-            query.andWhere(
-                '(LOWER(leave.leaveReason) LIKE LOWER(:search))',
-                { search: `%${search}%`},
-            );
-        }
-
-        if (sort) {
-            query.orderBy('leave.startDate', sort );
-        }
-        
-        if (page) {
-            query.offset(page-1)
-        }
-
-        if (perPage) {
-            query.limit(perPage)
-        }
         
         try {
-            const leaves = await query.getMany();
+            const leaves = await leaveRepository.find() ;
             return leaves
         } catch (error) {
             throw new InternalServerErrorException(); 
@@ -62,33 +40,10 @@ export class LeaveRepository extends Repository <Leave> {
     async getUserLeaves(filterDto: GetLeavesFilterDto, user: User ): Promise<Leave[]> {
         const { status, search, sort, page, perPage } = filterDto;
 
-        const query = this.createQueryBuilder('leave');
-        query.where({ user }); 
-
-        if (status) {
-            query.andWhere('leave.status = :status', { status })
-        }
-
-        if (search) {
-            query.andWhere(
-                '(LOWER(leave.leaveReason) LIKE LOWER(:search))',
-                { search: `%${search}%`},
-            );
-        }
-
-        if (sort) {
-            query.orderBy('leave.startDate', sort );
-        }
-        
-        if (page) {
-            query.offset(page-1)
-        }
-        if (perPage) {
-            query.limit(perPage)
-        }
+        const leaveRepository = getMongoRepository(Leave);
         
         try {
-            const leaves = await query.getMany();
+            const leaves = await leaveRepository.find({user }) ;
             return leaves
         } catch (error) {
             throw new InternalServerErrorException(); 

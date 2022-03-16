@@ -6,6 +6,7 @@ import { LeaveRepository } from './leave.repository';
 import { GetLeavesFilterDto } from './dto/get-leave.dto';
 import { LeaveStatus } from './leave-status.enum';
 import { User } from '../auth/user.entity';
+import { getMongoRepository } from 'typeorm';
 
 @Injectable()
 export class LeaveService {
@@ -28,19 +29,23 @@ export class LeaveService {
         return this.leaveRepository.getLeaves(filterDto);
     }
 
-    async updateLeaveStatus(id: string, status: LeaveStatus): Promise<Leave> {
-        const leave = await this.leaveRepository.findOne({ where: { id}})
+    async updateLeaveStatus(_id: string, status: LeaveStatus): Promise<Leave> {
+        const leave = await this.leaveRepository.findOne(_id)
 
+        // console.log(leave)
         leave.status = status;
         await this.leaveRepository.save(leave);
         return leave;
 
     }
 
-    async deleteLeave( id: string, user: User ): Promise<void> {
-        const result = await this.leaveRepository.delete({id, user});
-        if ( result.affected === 0) {
-            throw new NotFoundException()
+    async deleteLeave( _id: string, user: User ): Promise<void> {
+
+        const result = await this.leaveRepository.delete(_id);
+        
+        if ( !result.affected){
+             throw new NotFoundException()
         }
+        
     }
 }

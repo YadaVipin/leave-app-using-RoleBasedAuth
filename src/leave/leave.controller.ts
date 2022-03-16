@@ -47,19 +47,19 @@ export class LeaveController {
     @Patch('/:id/status')
     @Roles(UserRole.MANAGER)
     updateLeaveStatus(
-        @Param('id') id: string,
+        @Param('id') _id: string,
         @Body() updateLeaveStatusDto: UpdateLeaveStatusDto,
     ): Promise<Leave> {
         const { status } = updateLeaveStatusDto;
-        return this.leaveService.updateLeaveStatus(id, status);
+        return this.leaveService.updateLeaveStatus(_id, status);
     }
 
     @Delete('/:id')
     @Roles(UserRole.EMPLOYEE)
-    deleteLeave(
-        @Param('id') id: string,
+    async deleteLeave(
+        @Param('id') _id: string,
         @GetUser() user: User,
     ): Promise<void> {
-        return this.leaveService.deleteLeave(id, user);
+        return await this.leaveService.deleteLeave(_id, user);
     }
 }

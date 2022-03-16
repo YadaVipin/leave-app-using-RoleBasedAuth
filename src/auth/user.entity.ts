@@ -1,11 +1,12 @@
 import { Leave } from "src/leave/leave.entity";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ObjectIdColumn, OneToMany, ObjectID, PrimaryGeneratedColumn } from "typeorm";
 import { UserRole } from "./user-role.enum";
 
 @Entity()
 export class User {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+
+    @ObjectIdColumn()
+    id: ObjectID;
 
     @Column({ unique: true })
     empId: string;

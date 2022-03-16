@@ -6,13 +6,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
-        type: 'postgres',
-        autoLoadEntities: true,
+        type: 'mongodb',
         synchronize: true,
-        host: 'localhost',
-        port: 5432,
-        username: 'postgres',
-        password: 'postgres',
+        host: '127.0.0.1',
+        password: '',
+        port: 27017,
+        useNewUrlParser: true,
+        autoLoadEntities: true,
+        useUnifiedTopology: true,
         database: 'leave-app',
       }),
     LeaveModule,
